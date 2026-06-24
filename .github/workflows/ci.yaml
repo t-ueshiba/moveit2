@@ -138,7 +138,7 @@ jobs:
         run: moveit_kinematics/test/test_ikfast_plugins.sh
       - id: ici
         name: Run industrial_ci
-        uses: ros-industrial/industrial_ci@ba2a3d0f830f8051b356711a8df2fedfc5d256cf
+        uses: ros-industrial/industrial_ci@125164b9f1883cdf1858897a7146d1bebf2be5c6
         env: ${{ matrix.env }}
 # NOTE: Testspace is temporarily disabled and needs to be installed for the MoveIt org
 # See: https://github.com/moveit/moveit2/issues/2852

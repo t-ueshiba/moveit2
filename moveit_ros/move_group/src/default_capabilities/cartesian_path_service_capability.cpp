@@ -172,6 +172,14 @@ bool MoveGroupCartesianPathService::computeService(
                 };
           }
           bool global_frame = !moveit::core::Transforms::sameFrame(link_name, req->header.frame_id);
+          const moveit::core::LinkModel* link_model = nullptr;
+          bool found = false;
+          const Eigen::Isometry3d frame_pose = start_state.getFrameInfo(link_name, link_model, found);
+          if (!found)
+          {
+            RCLCPP_ERROR_STREAM(getLogger(), "Unknown frame: " << link_name);
+            res->error_code.val = moveit_msgs::msg::MoveItErrorCodes::FAILURE;
+          }
           RCLCPP_INFO(getLogger(),
                       "Attempting to follow %u waypoints for link '%s' using a step of %lf m "
                       "and jump threshold %lf (in %s reference frame)",
@@ -184,7 +192,7 @@ bool MoveGroupCartesianPathService::computeService(
           }
           std::vector<moveit::core::RobotStatePtr> traj;
           res->fraction = moveit::core::CartesianInterpolator::computeCartesianPath(
-              &start_state, jmg, traj, start_state.getLinkModel(link_name), waypoints, global_frame,
+              &start_state, jmg, traj, link_model, waypoints, global_frame,
               moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn);
           moveit::core::robotStateToRobotStateMsg(start_state, res->start_state);
 

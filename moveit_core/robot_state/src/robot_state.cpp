@@ -1356,9 +1356,15 @@ const Eigen::Isometry3d& RobotState::getFrameInfo(const std::string& frame_id, c
   robot_link = nullptr;
 
   // Check names of the attached bodies
+  std::cerr << "### frame_id=" << frame_id << ", attached_boody_map: [";
+  for (const auto& entry : attached_body_map_)
+      std::cerr << ' ' << entry.first;
+  std::cerr << ']' << std::endl;
+
   const auto jt = attached_body_map_.find(frame_id);
   if (jt != attached_body_map_.end())
   {
+    std::cerr << "### frame found in attached map" << std::endl;
     const Eigen::Isometry3d& transform = jt->second->getGlobalPose();
     robot_link = jt->second->getAttachedLink();
     frame_found = true;
@@ -1372,12 +1378,14 @@ const Eigen::Isometry3d& RobotState::getFrameInfo(const std::string& frame_id, c
     const Eigen::Isometry3d& transform = body.second->getGlobalSubframeTransform(frame_id, &frame_found);
     if (frame_found)
     {
+      std::cerr << "### global subframe transform found" << std::endl;
       robot_link = body.second->getAttachedLink();
       assert(checkLinkTransforms());
       return transform;
     }
   }
 
+  std::cerr << "### subframe not found" << std::endl;
   robot_link = nullptr;
   frame_found = false;
   return IDENTITY_TRANSFORM;
@@ -1877,6 +1885,9 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const EigenSTL::vector_Is
   }
   else if (consistency_limit_sets.size() == 1)
     consistency_limits = consistency_limit_sets[0];
+
+  // ensure RobotState is up-to-date before employing it in the IK solver
+  update(false);
 
   const std::vector<std::string>& solver_tip_frames = solver->getTipFrames();
 

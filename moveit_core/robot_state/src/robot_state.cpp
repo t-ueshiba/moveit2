@@ -1356,7 +1356,7 @@ const Eigen::Isometry3d& RobotState::getFrameInfo(const std::string& frame_id, c
   robot_link = nullptr;
 
   // Check names of the attached bodies
-  std::cerr << "### frame_id=" << frame_id << ", attached_boody_map: [";
+  std::cerr << "### frame_id=" << frame_id << ", attached_body_map: [";
   for (const auto& entry : attached_body_map_)
       std::cerr << ' ' << entry.first;
   std::cerr << ']' << std::endl;

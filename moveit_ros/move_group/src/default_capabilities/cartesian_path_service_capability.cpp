@@ -192,12 +192,12 @@ bool MoveGroupCartesianPathService::computeService(
           }
           std::vector<moveit::core::RobotStatePtr> traj;
           // res->fraction = moveit::core::CartesianInterpolator::computeCartesianPath(
-          //     &start_state, jmg, traj, link_model, waypoints, global_frame,
-          //     moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn, kinematics::KinematicsQueryOptions(),
-          //     start_state.getGlobalLinkTransform(link_model).inverse() * frame_pose);
+          //     &start_state, jmg, traj, start_state.getLinkModel(link_name), waypoints, global_frame,
+          //     moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn);
           res->fraction = moveit::core::CartesianInterpolator::computeCartesianPath(
               &start_state, jmg, traj, link_model, waypoints, global_frame,
-              moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn, kinematics::KinematicsQueryOptions());
+              moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn, kinematics::KinematicsQueryOptions(), kinematics::KinematicsBase::IKCostFn(),
+              start_state.getGlobalLinkTransform(link_model).inverse() * frame_pose);
           moveit::core::robotStateToRobotStateMsg(start_state, res->start_state);
 
           robot_trajectory::RobotTrajectory rt(context_->planning_scene_monitor_->getRobotModel(), req->group_name);

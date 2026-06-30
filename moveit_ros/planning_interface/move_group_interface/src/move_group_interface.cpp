@@ -1985,15 +1985,9 @@ geometry_msgs::msg::PoseStamped MoveGroupInterface::getRandomPose(const std::str
     if (impl_->getCurrentState(current_state))
     {
       current_state->setToRandomPositions(impl_->getJointModelGroup());
-    //const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
-      const moveit::core::LinkModel* lm = nullptr;
-      bool found = false;
-      const auto& frame_pose = current_state->getFrameInfo(eef, lm, found);
+      const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
       if (lm)
         pose = current_state->getGlobalLinkTransform(lm);
-      else
-        RCLCPP_ERROR(logger_, "No link model for effector frame \"%s\" found",
-                     eef.c_str());
     }
   }
   geometry_msgs::msg::PoseStamped pose_msg;
@@ -2017,15 +2011,14 @@ geometry_msgs::msg::PoseStamped MoveGroupInterface::getCurrentPose(const std::st
     moveit::core::RobotStatePtr current_state;
     if (impl_->getCurrentState(current_state))
     {
-      //const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
-      const moveit::core::LinkModel* lm = nullptr;
-      bool found = false;
-      const auto& frame_pose = current_state->getFrameInfo(eef, lm, found);
+      // const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
+      // if (lm)
+      //   pose = current_state->getGlobalLinkTransform(lm);
+      const auto* lm = current_state->getRigidlyConnectedParentLinkModel(eef);
       if (lm)
-        pose = current_state->getGlobalLinkTransform(lm);
+          pose = current_state->getFrameTransform(eef);
       else
-        RCLCPP_ERROR(logger_, "No link model for effector frame \"%s\" found[%d]",
-                     eef.c_str(), found);
+          RCLCPP_ERROR(logger_, "#### getCurrentPose(): Failed to get connected parent link model of frame[%s]", eef.c_str());
     }
   }
   geometry_msgs::msg::PoseStamped pose_msg;
@@ -2048,10 +2041,7 @@ std::vector<double> MoveGroupInterface::getCurrentRPY(const std::string& end_eff
     moveit::core::RobotStatePtr current_state;
     if (impl_->getCurrentState(current_state))
     {
-      //const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
-      const moveit::core::LinkModel* lm = nullptr;
-      bool found = false;
-      const auto& frame_pose = current_state->getFrameInfo(eef, lm, found);
+      const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
       if (lm)
       {
         result.resize(3);
@@ -2062,9 +2052,6 @@ std::vector<double> MoveGroupInterface::getCurrentRPY(const std::string& end_eff
         result[1] = pitch;
         result[2] = yaw;
       }
-      else
-        RCLCPP_ERROR(logger_, "No link model for effector frame \"%s\" found",
-                     eef.c_str());
     }
   }
   return result;

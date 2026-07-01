@@ -2011,14 +2011,9 @@ geometry_msgs::msg::PoseStamped MoveGroupInterface::getCurrentPose(const std::st
     moveit::core::RobotStatePtr current_state;
     if (impl_->getCurrentState(current_state))
     {
-      // const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
-      // if (lm)
-      //   pose = current_state->getGlobalLinkTransform(lm);
-      const auto* lm = current_state->getRigidlyConnectedParentLinkModel(eef);
+      const moveit::core::LinkModel* lm = current_state->getLinkModel(eef);
       if (lm)
-          pose = current_state->getFrameTransform(eef);
-      else
-          RCLCPP_ERROR(logger_, "#### getCurrentPose(): Failed to get connected parent link model of frame[%s]", eef.c_str());
+        pose = current_state->getGlobalLinkTransform(lm);
     }
   }
   geometry_msgs::msg::PoseStamped pose_msg;

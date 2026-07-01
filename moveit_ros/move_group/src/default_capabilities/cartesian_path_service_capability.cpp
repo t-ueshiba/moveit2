@@ -174,19 +174,12 @@ bool MoveGroupCartesianPathService::computeService(
           bool global_frame = !moveit::core::Transforms::sameFrame(link_name, req->header.frame_id);
           const moveit::core::LinkModel* link_model = nullptr;
           bool found = false;
-          RCLCPP_INFO_STREAM(getLogger(),
-                             "### computeService(): try to find...: "
-                             << link_name);
           const Eigen::Isometry3d frame_pose = start_state.getFrameInfo(link_name, link_model, found);
           if (!found)
           {
             RCLCPP_ERROR_STREAM(getLogger(), "Unknown frame: " << link_name);
             res->error_code.val = moveit_msgs::msg::MoveItErrorCodes::FAILURE;
           }
-          else
-              RCLCPP_INFO_STREAM(getLogger(),
-                                 "### computeService(): frame found: "
-                                 << link_name);
           RCLCPP_INFO(getLogger(),
                       "Attempting to follow %u waypoints for link '%s' using a step of %lf m "
                       "and jump threshold %lf (in %s reference frame)",

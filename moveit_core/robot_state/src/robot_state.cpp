@@ -1356,17 +1356,9 @@ const Eigen::Isometry3d& RobotState::getFrameInfo(const std::string& frame_id, c
   robot_link = nullptr;
 
   // Check names of the attached bodies
-  std::cerr << "### getFrameInfo(): frame_id=" << frame_id
-            << ", attached_body_map: [";
-  for (const auto& entry : attached_body_map_)
-      std::cerr << ' ' << entry.first;
-  std::cerr << ']' << std::endl;
-
   const auto jt = attached_body_map_.find(frame_id);
   if (jt != attached_body_map_.end())
   {
-    std::cerr << "### getFrameInfo(): frame found in attached map"
-              << std::endl;
     const Eigen::Isometry3d& transform = jt->second->getGlobalPose();
     robot_link = jt->second->getAttachedLink();
     frame_found = true;
@@ -1380,15 +1372,12 @@ const Eigen::Isometry3d& RobotState::getFrameInfo(const std::string& frame_id, c
     const Eigen::Isometry3d& transform = body.second->getGlobalSubframeTransform(frame_id, &frame_found);
     if (frame_found)
     {
-      std::cerr << "### getFrameInfo(): global subframe transform found"
-                << std::endl;
       robot_link = body.second->getAttachedLink();
       assert(checkLinkTransforms());
       return transform;
     }
   }
 
-  std::cerr << "### getFrameInfo(): subframe not found" << std::endl;
   robot_link = nullptr;
   frame_found = false;
   return IDENTITY_TRANSFORM;
